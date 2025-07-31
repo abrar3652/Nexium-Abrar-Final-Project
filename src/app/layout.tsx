@@ -7,13 +7,10 @@ import '../styles/globals.css';
        description: 'Generate delicious recipes with AI power!',
      };
 
-     export default function RootLayout({ children }: { children: React.ReactNode }) {
-       return (
-         <html lang="en">
-           <body>
-             <Navbar />
-             {children}
-           </body>
-         </html>
-       );
-     }
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
