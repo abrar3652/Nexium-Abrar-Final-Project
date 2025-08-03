@@ -6,7 +6,7 @@ import { getSupabase } from './supabase';
            const { data, error } = await supabase.auth.signInWithOtp({
              email,
              options: {
-               emailRedirectTo: 'http://localhost:3000/main',
+               emailRedirectTo: 'https://ai-powered-recipe-generator-two.vercel.app/main',
              },
            });
            if (error) {
