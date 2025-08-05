@@ -35,6 +35,9 @@ jobs:
       - name: Link Vercel project
         run: vercel link --yes --token=${{ secrets.VERCEL_TOKEN }} --project=ai-powered-recipe-generator
 
+      - name: Pull Vercel environment information
+        run: vercel pull --yes --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Build project artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
