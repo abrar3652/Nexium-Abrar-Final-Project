@@ -38,11 +38,16 @@ export default function Home() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // Add any required API key if n8n needs it
+          // 'Authorization': `Bearer ${process.env.N8N_API_KEY}` // Uncomment and set in Vercel env vars if needed
         },
         body: JSON.stringify({ input: message }),
       });
 
-      if (!response.ok) throw new Error('Network response was not ok');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Network response was not ok. Status: ${response.status}, Body: ${errorText}`);
+      }
       const data = await response.json();
 
       setMessages((prev) => {
@@ -50,7 +55,7 @@ export default function Home() {
         updatedMessages.pop(); // Remove typing indicator
 
         let aiResponse: Message;
-        if (data.formatted_output.includes('Result: ^^Title:')) {
+        if (data.formatted_output && data.formatted_output.includes('Result: ^^Title:')) {
           const lines = data.formatted_output.split('\n\n').map((line: string) => line.trim());
           const recipeData: Partial<Message['recipe']> = {};
 
@@ -77,19 +82,31 @@ export default function Home() {
             recipe: recipeData as Message['recipe'],
           };
         } else {
-          aiResponse = { text: data.formatted_output, sender: 'ai', time: new Date().toLocaleTimeString() };
+          aiResponse = { text: data.formatted_output || 'No response formatted.', sender: 'ai', time: new Date().toLocaleTimeString() };
         }
 
         return [...updatedMessages, aiResponse];
       });
     } catch (error) {
-      console.error('Error fetching AI response:', error);
-      setMessages((prev) => {
-        const updatedMessages = [...prev];
-        updatedMessages.pop(); // Remove typing indicator
-        return [...updatedMessages, { text: 'Error fetching recipe. Please try again later.', sender: 'ai', time: new Date().toLocaleTimeString() }];
-      });
-    }
+  console.error('Error fetching AI response:', (error as Error).message);
+  
+  const errorMessage =
+    error instanceof Error ? error.message : 'Unknown error';
+
+  setMessages((prev) => {
+    const updatedMessages = [...prev];
+    updatedMessages.pop(); // Remove typing indicator
+    return [
+      ...updatedMessages,
+      {
+        text: `Error fetching recipe: ${errorMessage}`,
+        sender: 'ai',
+        time: new Date().toLocaleTimeString(),
+      },
+    ];
+  });
+}
+
   }, [input]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
