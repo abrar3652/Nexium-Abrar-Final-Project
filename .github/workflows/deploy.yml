@@ -33,7 +33,7 @@ jobs:
         run: npm install --global vercel@latest
 
       - name: Link Vercel project
-        run: vercel link --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --project=ai-powered-recipe-generator
+        run: vercel link --yes --token=${{ secrets.VERCEL_TOKEN }} --project=ai-powered-recipe-generator
 
       - name: Build project artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --project=ai-powered-recipe-generator
